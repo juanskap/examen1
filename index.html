@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inteligencias Artificiales</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body { background: #0f0f23; color: #eee; }
+    header {
+      background: linear-gradient(135deg, #1a1a3e, #2d1b69);
+      text-align: center; padding: 50px 20px;
+    }
+    header h1 { font-size: 2.8em; margin-bottom: 10px; }
+    header p { color: #aaa; font-size: 1.15em; }
+    .container { max-width: 1300px; margin: 0 auto; padding: 40px 20px; }
+    .grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 30px;
+    }
+    .card {
+      background: #1e1e3f; border-radius: 18px; overflow: hidden;
+      transition: transform 0.3s, box-shadow 0.3s;
+      border: 1px solid #333;
+    }
+    .card:hover { transform: translateY(-5px); box-shadow: 0 12px 35px rgba(0,0,0,0.6); }
+
+    .card-img-wrap {
+      width: 100%; height: 200px; background: #2a2a5a;
+      display: flex; align-items: center; justify-content: center;
+      padding: 30px;
+    }
+    .card-img-wrap img {
+      max-width: 80%; max-height: 140px; object-fit: contain;
+      filter: drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+    }
+
+    .card-body { padding: 20px; }
+    .card-body h2 { font-size: 1.5em; margin-bottom: 6px; }
+    .card-body .category {
+      display: inline-block; background: #3b2b8a; padding: 4px 14px;
+      border-radius: 20px; font-size: 0.85em; margin-bottom: 10px;
+    }
+    .card-body .desc { color: #bbb; line-height: 1.6; margin-bottom: 15px; }
+    .card-body .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .card-body .btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 9px 18px; background: #4a3a9a; color: #fff;
+      text-decoration: none; border-radius: 8px; border: none;
+      cursor: pointer; font-size: 0.95em; transition: background 0.3s;
+    }
+    .card-body .btn:hover { background: #5f4bc7; }
+    .card-body .btn-download { background: #1a7a3a; }
+    .card-body .btn-download:hover { background: #259c4e; }
+    .card-body .btn-details { background: #3a3a6a; }
+    .card-body .btn-details:hover { background: #4f4f8f; }
+    .no-link { color: #666; font-size: 0.9em; font-style: italic; }
+
+    .gallery {
+      display: flex; gap: 8px; overflow-x: auto; padding: 10px 20px 15px;
+      scroll-snap-type: x mandatory;
+    }
+    .gallery::-webkit-scrollbar { height: 6px; }
+    .gallery::-webkit-scrollbar-thumb { background: #4a3a9a; border-radius: 10px; }
+    .gallery::-webkit-scrollbar-track { background: #222; border-radius: 10px; }
+    .gallery img {
+      height: 100px; border-radius: 10px; scroll-snap-align: start;
+      flex-shrink: 0; background: #2a2a5a;
+    }
+
+    .modal-overlay {
+      display: none; position: fixed; inset: 0; z-index: 1000;
+      background: rgba(0,0,0,0.7); align-items: center; justify-content: center;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: #1e1e3f; border-radius: 18px; max-width: 700px;
+      width: 90%; max-height: 85vh; overflow-y: auto; padding: 30px;
+      border: 1px solid #444; position: relative;
+    }
+    .modal-close {
+      position: absolute; top: 15px; right: 20px; font-size: 1.8em;
+      cursor: pointer; color: #888; background: none; border: none;
+    }
+    .modal-close:hover { color: #fff; }
+    .modal h2 { font-size: 2em; margin-bottom: 5px; }
+    .modal .cat {
+      display: inline-block; background: #3b2b8a; padding: 4px 14px;
+      border-radius: 20px; font-size: 0.85em; margin-bottom: 15px;
+    }
+    .modal p { color: #bbb; line-height: 1.7; margin-bottom: 20px; }
+    .modal .info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+    }
+    .modal .info-item {
+      background: #16163a; border-radius: 10px; padding: 12px;
+    }
+    .modal .info-item h4 { color: #9f8fef; font-size: 0.95em; margin-bottom: 4px; }
+    .modal .info-item p { color: #ccc; font-size: 0.9em; margin: 0; }
+    .modal .modal-logo {
+      display: flex; align-items: center; justify-content: center;
+      background: #16163a; border-radius: 10px; padding: 20px; margin-bottom: 20px;
+    }
+    .modal .modal-logo img {
+      max-width: 200px; max-height: 100px; object-fit: contain;
+    }
+    .modal h3 { color: #9f8fef; margin-top: 20px; margin-bottom: 8px; font-size: 1.1em; }
+    .modal ul { list-style: none; padding: 0; }
+    .modal ul li {
+      padding: 4px 0; color: #bbb; font-size: 0.95em;
+    }
+    .modal ul li::before { content: "âœ“ "; color: #5fbf6f; }
+
+    footer {
+      text-align: center; padding: 30px; color: #555; border-top: 1px solid #222;
+    }
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.8em; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Inteligencias Artificiales</h1>
+  <p>Explora las IAs m&aacute;s destacadas, sus usos, caracter&iacute;sticas y m&aacute;s</p>
+</header>
+
+<div class="container">
+  <div class="grid" id="aiGrid"></div>
+</div>
+
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <button class="modal-close" id="modalClose">&times;</button>
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<footer>
+  <p>Creado con informaci&oacute;n actualizada a 2026 &mdash; Proyecto Examen 1</p>
+</footer>
+
+<script>
+const aiData = [
+  {
+    name: "ChatGPT",
+    category: "Texto / Conversaci\u00f3n",
+    desc: "Asistente conversacional de OpenAI. Sirve para redactar textos, resolver dudas, programar, crear contenido y mantener conversaciones naturales.",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/e/ef/ChatGPT-Logo.svg",
+    gallery: [
+      "https://placehold.co/200x100/1a1a3e/7c6fbf?text=Chat+Web",
+      "https://placehold.co/200x100/2a2a5e/8c7fcf?text=Chat+App",
+      "https://placehold.co/200x100/3a3a6e/9c8fdf?text=GPT-4o"
+    ],
+    url: "https://chat.openai.com",
+    download: "https://apps.apple.com/app/chatgpt/id6448311069",
+    features: ["Redacci\u00f3n de textos", "Generaci\u00f3n de c\u00f3digo", "Traducci\u00f3n", "An\u00e1lisis de datos", "Soporte multimodal"],
+    pricing: "Gratuito / Plus $20/mes",
+    company: "OpenAI",
+    lanzamiento: "2022"
+  },
+  {
+    name: "Midjourney",
+    category: "Im\u00e1genes / Arte",
+    desc: "Genera im\u00e1genes hiperrealistas y art\u00edsticas a partir de descripciones de texto. Ideal para dise\u00f1adores, artistas y creadores visuales.",
+    logo: "https://dl.svgcdn.com/png/logos/midjourney-800.png",
+    gallery: [
+      "https://placehold.co/200x100/1a3e1a/6fbf7c?text=Arte+Digital",
+      "https://placehold.co/200x100/2a4e2a/7fcf8c?text=Retratos",
+      "https://placehold.co/200x100/3a5e3a/8fdf9c?text=Paisajes"
+    ],
+    url: "https://midjourney.com",
+    download: null,
+    features: ["Arte fotorrealista", "Estilos art\u00edsticos", "Variaciones r\u00e1pidas", "Resoluci\u00f3n HD", "Comunidad activa"],
+    pricing: "Desde $10/mes",
+    company: "Midjourney Inc.",
+    lanzamiento: "2022"
+  },
+  {
+    name: "GitHub Copilot",
+    category: "Programaci\u00f3n",
+    desc: "Asistente de c\u00f3digo impulsado por IA. Sugiere l\u00edneas y funciones completas mientras escribes, compatible con VS Code, JetBrains y m\u00e1s.",
+    logo: "https://logo.svgcdn.com/logos/github-copilot.png",
+    gallery: [
+      "https://placehold.co/200x100/3e1a1a/bf6f6f?text=VS+Code",
+      "https://placehold.co/200x100/4e2a2a/cf7f7f?text=JetBrains",
+      "https://placehold.co/200x100/5e3a3a/df8f8f?text=Terminal"
+    ],
+    url: "https://github.com/features/copilot",
+    download: "https://marketplace.visualstudio.com/items?itemName=GitHub.copilot",
+    features: ["Autocompletado inteligente", "Soporte multi-lenguaje", "Chat integrado", "Explicaci\u00f3n de c\u00f3digo", "Correcci\u00f3n de bugs"],
+    pricing: "Gratuito para estudiantes / $10/mes",
+    company: "GitHub / Microsoft",
+    lanzamiento: "2021"
+  },
+  {
+    name: "DALL-E",
+    category: "Im\u00e1genes / Arte",
+    desc: "Creador de im\u00e1genes de OpenAI. Genera ilustraciones originales desde texto, con gran calidad y creatividad. Integrado en ChatGPT Plus.",
+    logo: "https://download.logo.wine/logo/DALL-E/DALL-E-Logo.wine.png",
+    gallery: [
+      "https://placehold.co/200x100/1a3e3e/6fbfbf?text=Ilustraci%C3%B3n",
+      "https://placehold.co/200x100/2a4e4e/7fcfcf?text=Fotorrealismo",
+      "https://placehold.co/200x100/3a5e5e/8fdfdf?text=Abstracto"
+    ],
+    url: "https://openai.com/dall-e-3",
+    download: null,
+    features: ["Generaci\u00f3n de texto a imagen", "Edici\u00f3n por selecci\u00f3n", "Estilos variados", "Alta resoluci\u00f3n", "Integraci\u00f3n ChatGPT"],
+    pricing: "Incluido en ChatGPT Plus $20/mes",
+    company: "OpenAI",
+    lanzamiento: "2021"
+  },
+  {
+    name: "DeepSeek",
+    category: "Texto / Razonamiento",
+    desc: "Modelo de lenguaje avanzado con razonamiento profundo. Destaca en an\u00e1lisis, resoluci\u00f3n de problemas complejos y generaci\u00f3n de c\u00f3digo.",
+    logo: "https://vectorseek.com/wp-content/uploads/2025/01/deepseek-logo.png",
+    gallery: [
+      "https://placehold.co/200x100/3e3e1a/bfbf6f?text=Razonamiento",
+      "https://placehold.co/200x100/4e4e2a/cfcf7f?text=C%C3%B3digo",
+      "https://placehold.co/200x100/5e5e3a/dfdf8f?text=An%C3%A1lisis"
+    ],
+    url: "https://chat.deepseek.com",
+    download: "https://apps.apple.com/app/deepseek/id6737598363",
+    features: ["Razonamiento profundo", "Generaci\u00f3n de c\u00f3digo", "An\u00e1lisis de datos", "Contexto largo", "Gratuito"],
+    pricing: "Gratuito",
+    company: "DeepSeek (China)",
+    lanzamiento: "2023"
+  },
+  {
+    name: "Gemini",
+    category: "Texto / Multimodal",
+    desc: "IA multimodal de Google. Procesa texto, im\u00e1genes, audio y video. Integrado con el ecosistema Google y capaz de tareas complejas.",
+    logo: "https://www.pngall.com/wp-content/uploads/16/Google-Gemini-Logo-Transparent.png",
+    gallery: [
+      "https://placehold.co/200x100/2a1a3e/8f6fbf?text=Multimodal",
+      "https://placehold.co/200x100/3a2a4e/9f7fcf?text=Workspace",
+      "https://placehold.co/200x100/4a3a5e/af8fdf?text=Analytics"
+    ],
+    url: "https://gemini.google.com",
+    download: "https://play.google.com/store/apps/details?id=com.google.android.apps.gemini",
+    features: ["Multimodal (texto, img, audio, video)", "Integraci\u00f3n Google", "Razonamiento", "Google Workspace", "B\u00fasqueda web"],
+    pricing: "Gratuito / Advanced $20/mes",
+    company: "Google DeepMind",
+    lanzamiento: "2023"
+  },
+  {
+    name: "Claude",
+    category: "Texto / An\u00e1lisis",
+    desc: "Asistente de Anthropic enfocado en seguridad y an\u00e1lisis profundo. Destaca en procesar documentos largos, escribir y razonar.",
+    logo: "https://dblogo.com/logo/claude",
+    gallery: [
+      "https://placehold.co/200x100/3e1a2a/bf6f8f?text=Documentos",
+      "https://placehold.co/200x100/4e2a3a/cf7f9f?text=An%C3%A1lisis",
+      "https://placehold.co/200x100/5e3a4a/df8faf?text=Escritura"
+    ],
+    url: "https://claude.ai",
+    download: null,
+    features: ["Procesamiento de documentos largos", "An\u00e1lisis profundo", "Seguridad", "Escritura creativa", "Razonamiento"],
+    pricing: "Gratuito / Pro $20/mes",
+    company: "Anthropic",
+    lanzamiento: "2023"
+  },
+  {
+    name: "Leonardo AI",
+    category: "Im\u00e1genes / Video",
+    desc: "Plataforma de generaci\u00f3n de arte y video con IA. Perfecta para crear assets para juegos, concept art y animaciones.",
+    logo: "https://vectorseek.com/wp-content/uploads/2025/07/Leonardo-Ai-Logo-PNG-SVG-Vector-1.png",
+    gallery: [
+      "https://placehold.co/200x100/1a2a3e/6f8fbf?text=Concept+Art",
+      "https://placehold.co/200x100/2a3a4e/7f9fcf?text=Assets",
+      "https://placehold.co/200x100/3a4a5e/8fafdf?text=Animaci%C3%B3n"
+    ],
+    url: "https://leonardo.ai",
+    download: "https://apps.apple.com/app/leonardo-ai/id6476091400",
+    features: ["Generaci\u00f3n de assets", "Video IA", "Entrenamiento de modelos", "Edici\u00f3n", "API para developers"],
+    pricing: "Gratuito / Desde $10/mes",
+    company: "Leonardo AI",
+    lanzamiento: "2022"
+  },
+  {
+    name: "ElevenLabs",
+    category: "Audio / Voz",
+    desc: "S\u00edntesis de voz hiperrealista con IA. Genera voces naturales, clonaci\u00f3n de voz y locuciones para contenido multimedia.",
+    logo: "https://eleven-public-cdn.elevenlabs.io/payloadcms/elevenlabs-official-logo.svg",
+    gallery: [
+      "https://placehold.co/200x100/2a1a1a/bf7f6f?text=Locuci%C3%B3n",
+      "https://placehold.co/200x100/3a2a2a/cf8f7f?text=Clonaci%C3%B3n",
+      "https://placehold.co/200x100/4a3a3a/df9f8f?text=Audio+Libros"
+    ],
+    url: "https://elevenlabs.io",
+    download: null,
+    features: ["Voces hiperrealistas", "Clonaci\u00f3n de voz", "API REST", "M\u00faltiples idiomas", "Audio en tiempo real"],
+    pricing: "Gratuito / Desde $5/mes",
+    company: "ElevenLabs",
+    lanzamiento: "2023"
+  },
+  {
+    name: "Suno AI",
+    category: "M\u00fasica / Audio",
+    desc: "Genera canciones y m\u00fasica original a partir de descripciones de texto. Crea letras, melod\u00edas y estilos musicales diversos.",
+    logo: "https://upload.wikimedia.org/wikipedia/commons/6/62/Suno_AI_icon.svg",
+    gallery: [
+      "https://placehold.co/200x100/1a2a2a/6f8f8f?text=M%C3%BAsica",
+      "https://placehold.co/200x100/2a3a3a/7f9f9f?text=Letras",
+      "https://placehold.co/200x100/3a4a4a/8fafaf?text=Estilos"
+    ],
+    url: "https://suno.ai",
+    download: null,
+    features: ["Generaci\u00f3n de m\u00fasica", "Letras autom\u00e1ticas", "Estilos variados", "Voz sintetizada", "Exportaci\u00f3n de audio"],
+    pricing: "Gratuito / Pro $10/mes",
+    company: "Suno Inc.",
+    lanzamiento: "2023"
+  },
+  {
+    name: "Perplexity",
+    category: "B\u00fasqueda / Investigaci\u00f3n",
+    desc: "Motor de b\u00fasqueda conversacional con IA. Responde con fuentes citadas, ideal para investigaci\u00f3n y aprendizaje r\u00e1pido.",
+    logo: "https://dl.svgcdn.com/png/bxl/perplexity-ai-800.png",
+    gallery: [
+      "https://placehold.co/200x100/3a2a1a/bf9f6f?text=B%C3%BAsqueda",
+      "https://placehold.co/200x100/4a3a2a/cfaf7f?text=Fuentes",
+      "https://placehold.co/200x100/5a4a3a/dfbf8f?text=Investigaci%C3%B3n"
+    ],
+    url: "https://perplexity.ai",
+    download: null,
+    features: ["B\u00fasqueda con fuentes", "Investigaci\u00f3n profunda", "Resumen autom\u00e1tico", "Soporte multi-idioma", "Modo Pro"],
+    pricing: "Gratuito / Pro $20/mes",
+    company: "Perplexity AI",
+    lanzamiento: "2022"
+  },
+  {
+    name: "Runway",
+    category: "Video / Edici\u00f3n",
+    desc: "Plataforma de creaci\u00f3n y edici\u00f3n de video con IA. Genera videos desde texto, edita contenido y aplica efectos avanzados.",
+    logo: "https://vectorseek.com/wp-content/uploads/2025/03/Runway-ML-Logo-PNG-SVG-Vector.png",
+    gallery: [
+      "https://placehold.co/200x100/1a1a2a/6f6f9f?text=Video+IA",
+      "https://placehold.co/200x100/2a2a3a/7f7faf?text=Edici%C3%B3n",
+      "https://placehold.co/200x100/3a3a4a/8f8fbf?text=Efectos"
+    ],
+    url: "https://runwayml.com",
+    download: null,
+    features: ["Video de texto a video", "Edici\u00f3n autom\u00e1tica", "Eliminaci\u00f3n de fondo", "Generaci\u00f3n de efectos", "Colaboraci\u00f3n en equipo"],
+    pricing: "Gratuito / Desde $12/mes",
+    company: "Runway ML",
+    lanzamiento: "2021"
+  }
+];
+
+function renderCards() {
+  const grid = document.getElementById("aiGrid");
+  grid.innerHTML = aiData.map((ai, i) => `
+    <div class="card">
+      <div class="card-img-wrap">
+        <img src="${ai.logo}" alt="${ai.name}" loading="lazy">
+      </div>
+      <div class="card-body">
+        <span class="category">${ai.category}</span>
+        <h2>${ai.name}</h2>
+        <p class="desc">${ai.desc}</p>
+        <div class="actions">
+          <a class="btn" href="${ai.url}" target="_blank">Visitar</a>
+          ${ai.download ? `<a class="btn btn-download" href="${ai.download}" target="_blank">Descargar</a>` : '<span class="no-link">Sin app</span>'}
+          <button class="btn btn-details" onclick="openModal(${i})">Detalles</button>
+        </div>
+      </div>
+      <div class="gallery">
+        ${ai.gallery.map(g => `<img src="${g}" alt="${ai.name}">`).join("")}
+      </div>
+    </div>
+  `).join("");
+}
+
+function openModal(i) {
+  const ai = aiData[i];
+  const modal = document.getElementById("modal");
+  document.getElementById("modalContent").innerHTML = `
+    <h2>${ai.name}</h2>
+    <span class="cat">${ai.category}</span>
+    <div class="modal-logo">
+      <img src="${ai.logo}" alt="${ai.name}">
+    </div>
+    <p>${ai.desc}</p>
+    <div class="info-grid">
+      <div class="info-item">
+        <h4>Empresa</h4>
+        <p>${ai.company}</p>
+      </div>
+      <div class="info-item">
+        <h4>Lanzamiento</h4>
+        <p>${ai.lanzamiento}</p>
+      </div>
+      <div class="info-item">
+        <h4>Precio</h4>
+        <p>${ai.pricing}</p>
+      </div>
+      <div class="info-item">
+        <h4>Sitio web</h4>
+        <p><a href="${ai.url}" target="_blank" style="color:#7c6fbf;">${ai.url}</a></p>
+      </div>
+    </div>
+    <h3>Caracter\u00edsticas principales</h3>
+    <ul>
+      ${ai.features.map(f => `<li>${f}</li>`).join("")}
+    </ul>
+    ${ai.download ? `<a class="btn btn-download" href="${ai.download}" target="_blank" style="display:inline-flex;margin-top:15px;">Descargar app</a>` : ""}
+  `;
+  modal.classList.add("active");
+}
+
+document.getElementById("modalClose").addEventListener("click", () => {
+  document.getElementById("modal").classList.remove("active");
+});
+document.getElementById("modal").addEventListener("click", (e) => {
+  if (e.target === e.currentTarget) {
+    document.getElementById("modal").classList.remove("active");
+  }
+});
+
+renderCards();
+</script>
+
+</body>
+</html>
