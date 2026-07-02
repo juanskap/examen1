@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contacto - AI Hub</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
+    body {
+      background: linear-gradient(135deg, #f5f7f0, #e0e8e0);
+      min-height: 100vh; display: flex; align-items: center; justify-content: center;
+      padding: 20px;
+    }
+    .card {
+      background: #fff; border-radius: 20px; padding: 40px;
+      max-width: 520px; width: 100%;
+      border: 1px solid #d5e0d5; box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+    }
+    .card h1 {
+      font-size: 2em; color: #2d5a2d; margin-bottom: 5px; text-align: center;
+    }
+    .card .sub {
+      color: #6a8a6a; text-align: center; margin-bottom: 25px; font-size: 0.95em;
+    }
+    .card label {
+      display: block; font-size: 0.9em; color: #3a5a3a; margin-bottom: 5px; font-weight: 600;
+    }
+    .card input, .card textarea {
+      width: 100%; padding: 12px 14px;
+      border: 1px solid #d5e0d5; border-radius: 10px;
+      font-size: 0.95em; margin-bottom: 18px; transition: border 0.2s;
+      background: #fafbf8;
+    }
+    .card input:focus, .card textarea:focus {
+      outline: none; border-color: #3a7a3a; box-shadow: 0 0 0 3px rgba(58,122,58,0.1);
+    }
+    .card textarea { resize: vertical; min-height: 100px; }
+    .card .btn {
+      width: 100%; padding: 13px; background: #3a7a3a; color: #fff;
+      border: none; border-radius: 10px; font-size: 1.05em; cursor: pointer;
+      transition: background 0.3s;
+    }
+    .card .btn:hover { background: #4a9a4a; }
+    .card .back {
+      display: block; text-align: center; margin-top: 18px;
+      color: #6a8a6a; text-decoration: none; font-size: 0.9em;
+    }
+    .card .back:hover { color: #2d5a2d; text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Contacto</h1>
+    <p class="sub">Déjanos tu mensaje y te responderemos pronto</p>
+    <form onsubmit="alert('Mensaje enviado. Gracias por contactarnos.');return false;">
+      <label for="nombre">Nombre</label>
+      <input type="text" id="nombre" placeholder="Tu nombre" required>
+      <label for="email">Correo electrónico</label>
+      <input type="email" id="email" placeholder="tu@correo.com" required>
+      <label for="mensaje">Mensaje</label>
+      <textarea id="mensaje" placeholder="Escribe tu mensaje aquí..." required></textarea>
+      <button class="btn" type="submit">Enviar mensaje</button>
+    </form>
+    <a class="back" href="index.html">&larr; Volver a la página principal</a>
+  </div>
+</body>
+</html>
