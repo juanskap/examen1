@@ -6,7 +6,29 @@
   <title>Inteligencias Artificiales</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, sans-serif; }
-    body { background: #f5f7f0; color: #2d3a2d; }
+    body { background: #f5f7f0; color: #2d3a2d; padding-top: 64px; }
+
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 999;
+      background: #fff; border-bottom: 1px solid #d5e0d5;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 30px; height: 64px;
+    }
+    nav .brand {
+      display: flex; align-items: center; gap: 8px;
+      font-weight: 700; font-size: 1.2em; color: #2d5a2d;
+      text-decoration: none;
+    }
+    nav .brand svg { width: 28px; height: 28px; }
+    nav ul { display: flex; list-style: none; gap: 8px; }
+    nav ul li a {
+      display: block; padding: 8px 16px; border-radius: 8px;
+      color: #4a5a4a; text-decoration: none; font-size: 0.95em;
+      transition: background 0.2s, color 0.2s;
+    }
+    nav ul li a:hover { background: #e8f0e8; color: #2d5a2d; }
+    nav .hamburger { display: none; background: none; border: none; font-size: 1.5em; cursor: pointer; color: #2d5a2d; }
+
     header {
       background: linear-gradient(135deg, #2d5a2d, #3a7a3a);
       text-align: center; padding: 50px 20px;
@@ -67,6 +89,18 @@
       flex-shrink: 0; background: #f0f5f0; border: 1px solid #e0e8e0;
     }
 
+    .filters {
+      display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+      margin-bottom: 30px;
+    }
+    .filters button {
+      padding: 8px 20px; border-radius: 20px; border: 1px solid #c8d8c8;
+      background: #fff; color: #4a5a4a; cursor: pointer; font-size: 0.9em;
+      transition: all 0.2s;
+    }
+    .filters button:hover { border-color: #3a7a3a; color: #3a7a3a; }
+    .filters button.active { background: #3a7a3a; color: #fff; border-color: #3a7a3a; }
+
     .modal-overlay {
       display: none; position: fixed; inset: 0; z-index: 1000;
       background: rgba(0,0,0,0.5); align-items: center; justify-content: center;
@@ -115,6 +149,13 @@
     footer {
       text-align: center; padding: 30px; color: #8a9a8a; border-top: 1px solid #d5e0d5;
     }
+
+    @media (max-width: 768px) {
+      nav ul { display: none; position: absolute; top: 64px; left: 0; right: 0;
+        background: #fff; flex-direction: column; padding: 10px; border-bottom: 1px solid #d5e0d5; }
+      nav ul.open { display: flex; }
+      nav .hamburger { display: block; }
+    }
     @media (max-width: 600px) {
       header h1 { font-size: 1.8em; }
     }
@@ -122,13 +163,40 @@
 </head>
 <body>
 
-<header>
+<nav>
+  <a href="#" class="brand">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+    AI Hub
+  </a>
+  <ul id="navMenu">
+    <li><a href="#inicio" onclick="closeNav()">Inicio</a></li>
+    <li><a href="#ias" onclick="closeNav()">Inteligencias Artificiales</a></li>
+    <li><a href="#contacto" onclick="closeNav()">Contacto</a></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleNav()">&#9776;</button>
+</nav>
+
+<header id="inicio">
   <h1>Inteligencias Artificiales</h1>
   <p>Explora las IAs m&aacute;s destacadas, sus usos, caracter&iacute;sticas y m&aacute;s</p>
 </header>
 
-<div class="container">
+<div class="container" id="ias">
+  <div class="filters" id="filters">
+    <button class="active" data-filter="all">Todas</button>
+  </div>
   <div class="grid" id="aiGrid"></div>
+</div>
+
+<div id="contacto" style="max-width:700px;margin:0 auto 40px;padding:0 20px;">
+  <h2 style="text-align:center;color:#2d5a2d;margin-bottom:10px;">Contacto</h2>
+  <p style="text-align:center;color:#5a6a5a;margin-bottom:20px;">¿Tienes alguna pregunta o sugerencia?</p>
+  <form style="background:#fff;padding:25px;border-radius:14px;border:1px solid #d5e0d5;">
+    <input type="text" placeholder="Nombre" style="width:100%;padding:10px 14px;border:1px solid #d5e0d5;border-radius:8px;margin-bottom:12px;font-size:0.95em;">
+    <input type="email" placeholder="Correo electr\u00f3nico" style="width:100%;padding:10px 14px;border:1px solid #d5e0d5;border-radius:8px;margin-bottom:12px;font-size:0.95em;">
+    <textarea placeholder="Mensaje" rows="4" style="width:100%;padding:10px 14px;border:1px solid #d5e0d5;border-radius:8px;margin-bottom:12px;font-size:0.95em;resize:vertical;"></textarea>
+    <button type="button" style="padding:10px 28px;background:#3a7a3a;color:#fff;border:none;border-radius:8px;font-size:1em;cursor:pointer;">Enviar mensaje</button>
+  </form>
 </div>
 
 <div class="modal-overlay" id="modal">
@@ -350,9 +418,27 @@ const aiData = [
   }
 ];
 
+let currentFilter = "all";
+
+function renderFilters() {
+  const cats = [...new Set(aiData.map(a => a.category))];
+  const container = document.getElementById("filters");
+  container.innerHTML = `<button class="active" data-filter="all">Todas</button>
+    ${cats.map(c => `<button data-filter="${c}">${c}</button>`).join("")}`;
+  container.querySelectorAll("button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      container.querySelectorAll("button").forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
+      currentFilter = btn.dataset.filter;
+      renderCards();
+    });
+  });
+}
+
 function renderCards() {
+  const filtered = currentFilter === "all" ? aiData : aiData.filter(a => a.category === currentFilter);
   const grid = document.getElementById("aiGrid");
-  grid.innerHTML = aiData.map((ai, i) => `
+  grid.innerHTML = filtered.map(ai => `
     <div class="card">
       <div class="card-img-wrap">
         <img src="${ai.logo}" alt="${ai.name}" loading="lazy">
@@ -364,7 +450,7 @@ function renderCards() {
         <div class="actions">
           <a class="btn" href="${ai.url}" target="_blank">Visitar</a>
           ${ai.download ? `<a class="btn btn-download" href="${ai.download}" target="_blank">Descargar</a>` : '<span class="no-link">Sin app</span>'}
-          <button class="btn btn-details" onclick="openModal(${i})">Detalles</button>
+          <button class="btn btn-details" onclick="openModal(${aiData.indexOf(ai)})">Detalles</button>
         </div>
       </div>
       <div class="gallery">
@@ -372,6 +458,13 @@ function renderCards() {
       </div>
     </div>
   `).join("");
+}
+
+function toggleNav() {
+  document.getElementById("navMenu").classList.toggle("open");
+}
+function closeNav() {
+  document.getElementById("navMenu").classList.remove("open");
 }
 
 function openModal(i) {
@@ -420,6 +513,14 @@ document.getElementById("modal").addEventListener("click", (e) => {
   }
 });
 
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener("click", e => {
+    const el = document.querySelector(a.getAttribute("href"));
+    if (el) el.scrollIntoView({ behavior: "smooth" });
+  });
+});
+
+renderFilters();
 renderCards();
 </script>
 
